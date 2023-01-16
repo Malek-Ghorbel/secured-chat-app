@@ -28,8 +28,15 @@ class Client:
         gui_thred.start()
         receive_thread.start()
         
+    def on_closing(self, event=None):
+        self.sock.send("[exit]".encode(FORMAT))
+        self.sock.close()
+        self.win.quit()
+        
     def gui_loop(self):
         self.win = tkinter.Tk()
+        self.win.title("Chat Client")
+        self.win.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.win.configure(bg="lightgray")
         
         self.chat_label = tkinter.Label(self.win, text="Chat", bg="lightgrey")
@@ -58,7 +65,7 @@ class Client:
         
         
     def write(self):
-        message = f"{self.nickname} : {self.input_area.get('1.0', 'end')}"
+        message = f"{self.nickname} :{self.input_area.get('1.0', 'end')}"
         self.sock.send(message.encode(FORMAT))
         self.input_area.delete('1.0', 'end')
     
