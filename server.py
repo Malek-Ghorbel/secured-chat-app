@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 9090
@@ -23,6 +24,10 @@ def send_private_message( recipient, message, sender):
         if clients[client] == recipient:
             client.send(f"{sender} sent you a private message: {message}".encode("ascii"))
 
+def send_active_users():
+    active_users = "[Active Users] " + " ".join(nicknames)
+    for client in clients:
+        client.send(active_users.encode("ascii"))
 
 #handle the connection
 def handle(client):
@@ -37,13 +42,13 @@ def handle(client):
                 recipient = contenue.split(" ")[0][1:]
                 message = contenue.split(" ")[1]
                 send_private_message(recipient, message, sender)
-                print(f"{recipient} says {message} to {recipient}")
             elif message == "[exit]":
                 client.close()
                 nickname = clients[client]
                 del clients[client]
                 nicknames.remove(nickname)
-                broadcast("{nickname} left the chat!".encode("ascii"))
+                broadcast(f"{nickname} left the chat!")
+                send_active_users()
                 break
             else : 
                 broadcast(message)
@@ -52,7 +57,8 @@ def handle(client):
             nickname = clients[client]
             del clients[client]
             nicknames.remove(nickname)
-            broadcast("{nickname} left the chat!".encode("ascii"))
+            broadcast(f"{nickname} left the chat!")
+            send_active_users()
             break
             
             
@@ -70,8 +76,9 @@ def receive():
         
         print(f"The nickname of the client is {nickname}")
         broadcast(f"{nickname} connected to the server \n")
-        client.send("Connected to the server".encode(FORMAT))
-        
+        time.sleep(0.5)
+        client.send("Connected to the server \n".encode(FORMAT))
+        send_active_users()
         thread = threading.Thread(target=handle, args=(client,))
         thread.start()
         
