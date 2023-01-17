@@ -88,8 +88,14 @@ class Client:
                     self.users_listbox.insert(tkinter.END, user) 
         
     def write(self):
-        message = f"{self.nickname} :{self.input_area.get('1.0', 'end')}"
-        self.sock.send(message.encode(FORMAT))
+        message = f"{self.input_area.get('1.0', 'end')}"
+        
+        self.text_area.config(state='normal')
+        self.text_area.insert('end', f"you : {message}")
+        self.text_area.yview('end')
+        self.text_area.config(state='disabled')
+        
+        self.sock.send(f"{self.nickname} :{message}".encode(FORMAT))
         self.input_area.delete('1.0', 'end')
     
     def stop(self):

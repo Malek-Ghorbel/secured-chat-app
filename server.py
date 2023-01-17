@@ -15,9 +15,10 @@ nicknames = []
 
 
 #broadcast messages to all clients:
-def broadcast(message):
+def broadcast(message, client1):
     for client in clients:
-        client.send(message.encode(FORMAT))
+        if client != client1:
+            client.send(message.encode(FORMAT))
 
 def send_private_message( recipient, message, sender):
     for client in clients:
@@ -47,17 +48,17 @@ def handle(client):
                 nickname = clients[client]
                 del clients[client]
                 nicknames.remove(nickname)
-                broadcast(f"{nickname} left the chat!")
+                broadcast(f"{nickname} left the chat!", client)
                 send_active_users()
                 break
             else : 
-                broadcast(message)
+                broadcast( message, client)
         except:
             client.close()
             nickname = clients[client]
             del clients[client]
             nicknames.remove(nickname)
-            broadcast(f"{nickname} left the chat!")
+            broadcast(f"{nickname} left the chat!", client)
             send_active_users()
             break
             
@@ -75,7 +76,7 @@ def receive():
         clients[client] = nickname
         
         print(f"The nickname of the client is {nickname}")
-        broadcast(f"{nickname} connected to the server \n")
+        broadcast(f"{nickname} connected to the server \n", client)
         time.sleep(0.5)
         client.send("Connected to the server \n".encode(FORMAT))
         send_active_users()
