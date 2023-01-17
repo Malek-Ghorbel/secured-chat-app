@@ -46,13 +46,13 @@ def password_enter(event):
 
 
 def hide():
-    openeye.config(file='closeye.png')
+    openeye.config(file='./img/closeye.png')
     passwordEntry.config(show='*')
     eyeButton.config(command=show)
 
 
 def show():
-    openeye.config(file='openeye.png')
+    openeye.config(file='./img/openeye.png')
     passwordEntry.config(show='')
     eyeButton.config(command=hide)
 
@@ -67,43 +67,48 @@ login_window = Tk()
 login_window.geometry('990x660+50+50')
 login_window.resizable(0, 0)
 login_window.title('Login Page')
-bgImage = ImageTk.PhotoImage(file='bg.jpg')
+bgImage = ImageTk.PhotoImage(file='./img/bg.jpg')
 
 bgLabel = Label(login_window, image=bgImage)
 bgLabel.place(x=0, y=0)
 
 heading = Label(login_window, text='USER LOGIN', font=(
-    'Microsoft Yahei UI Light', 23, 'bold'), bg='white', fg='firebrick1')
+    'Microsoft Yahei UI Light', 23, 'bold'), bg='white', fg='#000064')
 heading.place(x=605, y=120)
 
+usernameLabel = Label(text='Username', font=(
+    'Microsoft Yahei UI Light', 10, 'bold'), bg='white', fg='#000064')
+usernameLabel.place(x=580, y=180)
 usernameEntry = Entry(login_window, width=25, font=(
-    'Microsoft Yahei UI Light', 11, 'bold'), bd=0, fg='firebrick1')
+    'Microsoft Yahei UI Light', 11, 'bold'), bd=0, fg='#000064')
 usernameEntry.place(x=580, y=200)
-usernameEntry.insert(0, "UserName")
 usernameEntry.bind('<FocusIn>', username_enter)
 
-frame1 = Frame(login_window, width=250, height=2, bg='firebrick1')
+frame1 = Frame(login_window, width=250, height=2, bg='#000064')
 frame1.place(x=580, y=222)
 
-passwordEntry = Entry(login_window, width=25, font=(
-    'Microsoft Yahei UI Light', 11, 'bold'), bd=0, fg='firebrick1')
+passwordLabel = Label(text='Password', font=(
+    'Microsoft Yahei UI Light', 10, 'bold'), bg='white', fg='#000064')
+passwordLabel.place(x=580, y=230)
+
+passwordEntry = Entry(login_window, width=25, show="*", font=(
+    'Microsoft Yahei UI Light', 11, 'bold'), bd=0, fg='#000064')
 passwordEntry.place(x=580, y=260)
-passwordEntry.insert(0, "Password")
 passwordEntry.bind('<FocusIn>', password_enter)
 
-frame2 = Frame(login_window, width=250, height=2, bg='firebrick1')
+frame2 = Frame(login_window, width=250, height=2, bg='#000064')
 frame2.place(x=580, y=282)
-openeye = PhotoImage(file='openeye.png')
+openeye = PhotoImage(file='./img/closeye.png')
 eyeButton = Button(login_window, image=openeye, bd=0,
-                   bg='white', activebackground='white', cursor="hand2", command=hide)
+                   bg='white', activebackground='white', cursor="hand2", command=show)
 eyeButton.place(x=800, y=254)
 
 loginButton = Button(login_window, text='Login', font=(
-    'Open Sans', 16, 'bold'), fg='white', bg='firebrick1', activeforeground='firebrick1', activebackground='firebrick1', cursor='hand2', bd=0, width=19, command=connect_database)
+    'Open Sans', 16, 'bold'), fg='white', bg='#000064', activeforeground='#000064', activebackground='#000064', cursor='hand2', bd=0, width=19, command=connect_database)
 loginButton.place(x=578, y=350)
 
 signupLabel = Label(login_window, text='Dont have an account ? ', font=(
-    'Open Sans', 9, 'bold'), fg='firebrick1', bg='white')
+    'Open Sans', 9, 'bold'), fg='#000064', bg='white')
 signupLabel.place(x=590, y=500)
 
 newaccountButton = Button(login_window, text='Create new account', font=(
