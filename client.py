@@ -40,24 +40,25 @@ class Client:
         self.win = tkinter.Tk()
         self.win.title("Chat Client")
         self.win.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.win.configure(bg="lightgray")
+        self.win.configure(bg="#000064")
         
         #connected users:
-        
         self.users_frame = tkinter.Frame(self.win)
-        self.users_frame.configure(bg="lightgray")
+        self.users_frame.configure(bg="#000064")
         self.users_frame.pack()
         
-        self.users_label = tkinter.Label(self.users_frame, text="Connected Users", bg="lightgrey")
-        self.users_label.config(font=("Arial", 12))
+        self.users_label = tkinter.Label(self.users_frame, text="Connected Users", bg="#000064")
+        self.users_label.config(font=("Arial", 12), fg='white')
         self.users_label.pack(padx= 20, pady= 5)
         
         self.users_listbox = tkinter.Listbox(self.users_frame, height=8)
         self.users_listbox.pack(padx= 20, pady= 5)
         
+        self.users_listbox.bind("<<ListboxSelect>>", self.on_select)
+        
         #chatbox
-        self.chat_label = tkinter.Label(self.win, text="Chat", bg="lightgrey")
-        self.chat_label.config(font=("Arial", 12))
+        self.chat_label = tkinter.Label(self.win, text="Chat", bg="#000064")
+        self.chat_label.config(font=("Arial", 12), fg='white')
         self.chat_label.pack(padx= 20, pady= 5)
         
         self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
@@ -65,13 +66,14 @@ class Client:
         self.text_area.config(state="disabled", height=14)
         
         #message input
-        self.msg_label = tkinter.Label(self.win, text="Message", bg="lightgrey")
-        self.msg_label.config(font=("Arial", 12))
+        self.msg_label = tkinter.Label(self.win, text="Message", bg="#000064")
+        self.msg_label.config(font=("Arial", 12), fg='white')
         self.msg_label.pack(padx= 20, pady= 5)
         
         self.input_area = tkinter.Text(self.win, height=3)
         self.input_area.pack(padx= 20, pady= 5)
         
+        #send button
         self.send_button = tkinter.Button(self.win, text="Send", command=self.write)
         self.send_button.config(font=("Arial", 12))
         self.send_button.pack(padx= 20, pady= 5)
@@ -80,6 +82,12 @@ class Client:
         
         self.win.mainloop()
         self.win.protocol("wM_DELETE_WINDOW", self.stop)
+
+    def on_select(self,event):
+        selection = self.users_listbox.get(self.users_listbox.curselection())
+        print(selection)
+        self.input_area.insert('end', f"@{selection} ")
+        self.input_area.yview('end')
 
     def update_active_users(self):
         if self.gui_done:

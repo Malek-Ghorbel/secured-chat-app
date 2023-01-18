@@ -41,7 +41,7 @@ def handle(client):
             contenue = message[x:]
             if contenue[0] == "@":
                 recipient = contenue.split(" ")[0][1:]
-                message = contenue.split(" ")[1]
+                message = " ".join(contenue.split(" ")[1:])
                 send_private_message(recipient, message, sender)
             elif message == "[exit]":
                 client.close()
