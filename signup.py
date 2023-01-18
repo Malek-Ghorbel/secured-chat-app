@@ -28,12 +28,19 @@ def connect_database():
             return
         password = hashlib.sha256(
             passwordEntry.get().encode()).hexdigest()
-        mycursor.execute("INSERT INTO userdata (username,password) VALUES(?,?)",
-                         (usernameEntry.get(), password))
+        username = usernameEntry.get()
+        userExist = mycursor.execute(
+            "SELECT * FROM userdata WHERE username=?", (username,)).fetchall()
+        if userExist:
+            messagebox.showerror(
+                'Error', 'User already exist')
+            return
+        else:
+            mycursor.execute("INSERT INTO userdata (username,password) VALUES(?,?)",
+                             (usernameEntry.get(), password))
         conn.commit()
         conn.close()
         messagebox.showinfo('Success', 'Registration successful')
-        signup_window.destroy()
         client = Client(socket.gethostbyname(
             socket.gethostname()), 9090, usernameEntry.get())
         signup_window.destroy()
