@@ -3,6 +3,7 @@ import threading
 import tkinter
 import tkinter.scrolledtext
 from tkinter import simpledialog
+from RSAtools import *
 
 
 HOST = socket.gethostbyname(socket.gethostname())
@@ -14,6 +15,8 @@ active_users = []
 class Client:
 
     def __init__(self, host, port, username):
+        self.private_key = generate_private_key()
+        self.public_key = get_public_key(self.private_key)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, port))
 
@@ -40,14 +43,14 @@ class Client:
         self.win = tkinter.Tk()
         self.win.title("Chat Client")
         self.win.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.win.configure(bg="#000064")
+        self.win.configure(bg="#021b39")
         
         #connected users:
         self.users_frame = tkinter.Frame(self.win)
-        self.users_frame.configure(bg="#000064")
+        self.users_frame.configure(bg="#021b39")
         self.users_frame.pack()
         
-        self.users_label = tkinter.Label(self.users_frame, text="Connected Users", bg="#000064")
+        self.users_label = tkinter.Label(self.users_frame, text="Connected Users", bg="#021b39")
         self.users_label.config(font=("Arial", 12), fg='white')
         self.users_label.pack(padx= 20, pady= 5)
         
@@ -57,7 +60,7 @@ class Client:
         self.users_listbox.bind("<<ListboxSelect>>", self.on_select)
         
         #chatbox
-        self.chat_label = tkinter.Label(self.win, text="Chat", bg="#000064")
+        self.chat_label = tkinter.Label(self.win, text="Chat", bg="#021b39")
         self.chat_label.config(font=("Arial", 12), fg='white')
         self.chat_label.pack(padx= 20, pady= 5)
         
@@ -66,7 +69,7 @@ class Client:
         self.text_area.config(state="disabled", height=14)
         
         #message input
-        self.msg_label = tkinter.Label(self.win, text="Message", bg="#000064")
+        self.msg_label = tkinter.Label(self.win, text="Message", bg="#021b39")
         self.msg_label.config(font=("Arial", 12), fg='white')
         self.msg_label.pack(padx= 20, pady= 5)
         
@@ -85,7 +88,7 @@ class Client:
 
     def on_select(self,event):
         selection = self.users_listbox.get(self.users_listbox.curselection())
-        print(selection)
+        #print(selection)
         self.input_area.insert('end', f"@{selection} ")
         self.input_area.yview('end')
 
@@ -101,11 +104,19 @@ class Client:
         message = f"{self.input_area.get('1.0', 'end')}"
         
         self.text_area.config(state='normal')
-        self.text_area.insert('end', f"you : {message}")
+        contenue = message
+        if contenue[0] == "@":
+            recipient = contenue.split(" ")[0][1:]
+            contenue = " ".join(contenue.split(" ")[1:])
+            self.text_area.insert('end', f"you -> {recipient} : {contenue}")
+        else :
+            self.text_area.insert('end', f"you : {message}")
         self.text_area.yview('end')
         self.text_area.config(state='disabled')
         
-        self.sock.send(f"{self.nickname} :{message}".encode(FORMAT))
+        text_to_send = f"{self.nickname} :{message}"
+        text_to_send = encrypt_message(self.server_public_key , text_to_send)
+        self.sock.send(text_to_send)
         self.input_area.delete('1.0', 'end')
     
     def stop(self):
@@ -113,14 +124,23 @@ class Client:
         self.win.destroy()
         self.sock.close()
         exit(0)
-        
-    
+
     def receive(self):
         while self.running:
             try:
-                message = self.sock.recv(1024).decode(FORMAT)
-                if message == 'NICK':
-                    self.sock.send(self.nickname.encode(FORMAT))
+                message = self.sock.recv(1024)
+                print( message)
+                message = decrypt_message(self.private_key , message)
+                if message.startswith("KEY"):
+                    message = message
+                    key = " ".join(message.split(" ")[1:]).encode(FORMAT)
+                    self.server_public_key = desrialize_key(key )
+                    
+                elif message == 'NICK':
+                    encrypted = encrypt_message(self.server_public_key, self.nickname)
+                    self.sock.send( encrypted  )
+                    myKey = serialize_key( self.public_key)
+                    self.sock.send( myKey  )
                 elif message.startswith("[Active Users] "):
                     self.active_users = message.split(" ")[2:]
                     self.update_active_users()
@@ -134,7 +154,7 @@ class Client:
                 break
             except Exception as e:
                 print(e)
-                #self.sock.close()
+                self.sock.close()
                 break
             
 
