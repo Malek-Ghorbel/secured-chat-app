@@ -11,3 +11,6 @@ pip install cryptography
 python server.py
 ```
 ###### then run signup.py to create some clients to communicate (or login.py if you have already an account) 
+```
+python signup.py
+```
