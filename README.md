@@ -1,6 +1,6 @@
 # secured-chat-app
 ##  A chat application with end-to-end encryption 
-This app was built in **python** and the encryption was made with the **RSA** protocol implemented by the [cryptography](https://cryptography.io/en/latest/) library: the server and the clients each have a pair of keys: public one for encryption which is available and private one for decryption which is personal
+This app was built in **python** using TKinter & based on Sockets and the encryption was made with the **RSA** protocol implemented by the [cryptography](https://cryptography.io/en/latest/) library: the server and the clients each have a pair of keys: public one for encryption which is available and private one for decryption which is personal
 #### before starting you need to run these commands to install necessary packages :
 ```
 pip install --upgrade Pillow
